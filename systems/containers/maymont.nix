@@ -23,7 +23,6 @@
     gcc
     gnumake
     rustup
-    go
     direnv
     ripgrep
     tmux
