@@ -75,9 +75,6 @@
         "com.apple.keyboard.fnState" = false;
         ApplePressAndHoldEnabled = false;
 
-        InitialKeyRepeat = 10;
-        KeyRepeat = 1;
-
         PMPrintingExpandedStateForPrint = true;
         NSNavPanelExpandedStateForSaveMode = true;
         NSNavPanelExpandedStateForSaveMode2 = true;

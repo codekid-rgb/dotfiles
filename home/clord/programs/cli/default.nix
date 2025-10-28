@@ -22,7 +22,6 @@
         "node_modules/.bin"
         "$HOME/.claude/local"
         "$HOME/.local/node_modules/.bin"
-        "$HOME/go/bin"
       ];
       sessionVariables = {
         EDITOR = "nvim";
