@@ -295,9 +295,13 @@
                   };
                   autoUpdate = {
                     enable = true; # Auto-update dotfiles on boot!
-                    periodic = false; # Only on boot, not on a schedule
+                    periodic = false; # Using custom schedule below
                   };
                 };
+              }
+              # Check for updates every 30 minutes in the background
+              {
+                system.autoUpdate.onCalendar = "*:0/30"; # Every 30 minutes
               }
               (mkUserConfig {
                 username = "clord";

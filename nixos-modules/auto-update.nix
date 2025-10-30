@@ -99,6 +99,10 @@ in {
           User = "root";
           # Prevent service from failing the boot process
           SuccessExitStatus = "0 1";
+          # Run with low priority to avoid impacting system performance
+          Nice = 19;
+          IOSchedulingClass = "idle";
+          CPUSchedulingPolicy = "idle";
         };
 
         script = ''

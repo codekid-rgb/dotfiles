@@ -169,17 +169,27 @@ system.autoUpdate = {
 };
 ```
 
-### Aggressive updates (every hour)
+### Frequent updates (every 30 minutes)
+
+Perfect for workstations where you want changes applied quickly:
 
 ```nix
 system.autoUpdate = {
   enable = true;
-  onBoot = true;
-  onCalendar = "hourly";
-  flakePath = "/home/clord/dotfiles";
-  operation = "switch";
+  onCalendar = "*:0/30";  # Every 30 minutes
 };
 ```
+
+Or every hour:
+
+```nix
+system.autoUpdate = {
+  enable = true;
+  onCalendar = "hourly";
+};
+```
+
+Note: Service runs at low priority (Nice=19, idle I/O) so it won't impact performance.
 
 ### Test-only mode (non-persistent)
 
@@ -187,7 +197,6 @@ system.autoUpdate = {
 system.autoUpdate = {
   enable = true;
   onCalendar = "daily";
-  flakePath = "/home/clord/dotfiles";
   operation = "test";  # Changes won't persist across reboots
 };
 ```
@@ -205,7 +214,12 @@ Once enabled, systemd handles everything automatically:
    - A systemd timer triggers the service at the specified interval
    - Same update check runs automatically
 
-3. **No manual intervention needed**:
+3. **Low priority execution**:
+   - Service runs with Nice=19 (lowest CPU priority)
+   - Uses idle I/O and CPU scheduling
+   - Won't impact system performance or user experience
+
+4. **No manual intervention needed**:
    - You just push to your git repo
    - Next boot (or timer trigger), changes apply automatically
    - Check logs anytime with `journalctl -u dotfiles-auto-update.service`
