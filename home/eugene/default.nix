@@ -12,6 +12,9 @@
     editors.enable = true;
     git.enable = true;
 
+    # Password manager
+    onepassword.enable = true;
+
     # Desktop setup
     desktop = {
       enable = true;

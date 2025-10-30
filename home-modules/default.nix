@@ -12,5 +12,6 @@
     ./gaming.nix
     ./communication.nix
     ./development-base.nix
+    ./1password.nix
   ];
 }

@@ -141,5 +141,9 @@
     communication = {
       enable = lib.mkEnableOption "communication applications";
     };
+
+    onepassword = {
+      enable = lib.mkEnableOption "1Password password manager";
+    };
   };
 }
