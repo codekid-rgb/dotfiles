@@ -20,7 +20,10 @@ in {
 
     onCalendar = mkOption {
       type = types.nullOr types.str;
-      default = if (config.roles.autoUpdate.periodic or false) then "daily" else null;
+      default =
+        if (config.roles.autoUpdate.periodic or false)
+        then "daily"
+        else null;
       example = "hourly";
       description = ''
         Systemd calendar expression for periodic updates.
