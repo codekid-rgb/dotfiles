@@ -12,6 +12,9 @@
         gnome.gnome-tweaks # GNOME customization
         dconf-editor # GNOME settings editor
 
+        # Editors
+        zed-editor # Modern code editor
+
         # File management
         # (nautilus is included with GNOME by default)
 
