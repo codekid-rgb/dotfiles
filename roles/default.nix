@@ -38,8 +38,54 @@
 
     desktop = {
       enable = lib.mkEnableOption "Desktop environment and GUI apps";
-      gaming = lib.mkEnableOption "Gaming tools and platforms";
-      multimedia = lib.mkEnableOption "Multimedia editing tools";
+      browsers = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Include web browsers";
+      };
+      communication = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Include communication apps (Slack, Discord, etc)";
+      };
+      productivity = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Include productivity tools (office suite, PDF viewers, etc)";
+      };
+    };
+
+    gaming = {
+      enable = lib.mkEnableOption "Gaming tools and platforms";
+      steam = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Include Steam gaming platform";
+      };
+      emulation = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = "Include RetroArch and emulation tools";
+      };
+    };
+
+    multimedia = {
+      enable = lib.mkEnableOption "Multimedia editing and creation tools";
+      video = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Include video editing and playback tools";
+      };
+      audio = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Include audio editing and playback tools";
+      };
+      graphics = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = "Include image/graphics editing tools";
+      };
     };
 
     server = {

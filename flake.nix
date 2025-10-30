@@ -278,8 +278,20 @@
                   };
                   desktop = {
                     enable = true; # Has GNOME
-                    gaming = false;
-                    multimedia = false;
+                    browsers = true;
+                    communication = true;
+                    productivity = true;
+                  };
+                  gaming = {
+                    enable = true;
+                    steam = true;
+                    emulation = true; # RetroArch
+                  };
+                  multimedia = {
+                    enable = true;
+                    video = true; # VLC, MPV, OBS
+                    audio = true; # Audacity
+                    graphics = false; # GIMP, Inkscape (keep minimal for now)
                   };
                 };
               }
@@ -342,11 +354,9 @@
                     enable = false;
                     includeCloud = false;
                   };
-                  desktop = {
-                    enable = false; # Headless
-                    gaming = false;
-                    multimedia = false;
-                  };
+                  desktop.enable = false; # Headless
+                  gaming.enable = false;
+                  multimedia.enable = false;
                   server.enable = true;
                 };
               }
@@ -398,11 +408,9 @@
                     enable = false;
                     includeCloud = false;
                   };
-                  desktop = {
-                    enable = false;
-                    gaming = false;
-                    multimedia = false;
-                  };
+                  desktop.enable = false;
+                  gaming.enable = false;
+                  multimedia.enable = false;
                 };
               }
               (mkUserConfig {
@@ -450,11 +458,9 @@
                     enable = false;
                     includeCloud = false;
                   };
-                  desktop = {
-                    enable = false; # Headless server
-                    gaming = false;
-                    multimedia = false;
-                  };
+                  desktop.enable = false; # Headless server
+                  gaming.enable = false;
+                  multimedia.enable = false;
                   server.enable = true;
                 };
               }
@@ -493,6 +499,9 @@
     neovim-flake = {
       url = "github:notashelf/nvf";
       inputs.nixpkgs.follows = "nixpkgs";
+    };
+    ghostty = {
+      url = "github:ghostty-org/ghostty";
     };
   };
 }

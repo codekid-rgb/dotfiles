@@ -9,6 +9,9 @@
     enableRedistributableFirmware = true;
     cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
     pulseaudio.enable = false;
+
+    # System76 hardware support
+    system76.enableAll = true;
   };
   boot = {
     initrd = {
@@ -90,6 +93,10 @@
       alsa.support32Bit = true;
       pulse.enable = true;
     };
+
+    # Disable power-profiles-daemon for System76 hardware
+    # (conflicts with system76-power)
+    power-profiles-daemon.enable = false;
   };
 
   # Sound is configured via pipewire above
