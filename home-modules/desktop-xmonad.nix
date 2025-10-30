@@ -1,10 +1,10 @@
 {
   lib,
   pkgs,
-  roles ? {},
+  config,
   ...
 }: {
-  config = lib.mkIf ((roles.desktop.enable or false) && (roles.desktop.windowManager or "") == "xmonad") {
+  config = lib.mkIf (config.roles.desktop.enable && config.roles.desktop.windowManager == "xmonad") {
     home.packages = with pkgs; [
       # XMonad utilities
       dmenu # Application launcher

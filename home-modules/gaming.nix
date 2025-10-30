@@ -1,12 +1,12 @@
 {
   lib,
   pkgs,
-  roles ? {},
+  config,
   ...
 }: {
   config = lib.mkMerge [
     # Base gaming setup
-    (lib.mkIf (roles.gaming.enable or false) {
+    (lib.mkIf config.roles.gaming.enable {
       home.packages = with pkgs; [
         # Gaming utilities
         # mangohud # Performance overlay
@@ -16,7 +16,7 @@
     })
 
     # Steam
-    (lib.mkIf ((roles.gaming.enable or false) && (roles.gaming.steam or false)) {
+    (lib.mkIf (config.roles.gaming.enable && config.roles.gaming.steam) {
       home.packages = with pkgs; [
         steam
         # steam-run
@@ -24,7 +24,7 @@
     })
 
     # Emulation
-    (lib.mkIf ((roles.gaming.enable or false) && (roles.gaming.emulation or false)) {
+    (lib.mkIf (config.roles.gaming.enable && config.roles.gaming.emulation) {
       home.packages = with pkgs; [
         # retroarch
         # Additional emulators as needed
@@ -32,7 +32,7 @@
     })
 
     # Game development
-    (lib.mkIf ((roles.gaming.enable or false) && (roles.gaming.development or false)) {
+    (lib.mkIf (config.roles.gaming.enable && config.roles.gaming.development) {
       home.packages = with pkgs; [
         godot_4 # Game engine
         # unity
@@ -41,7 +41,7 @@
     })
 
     # Minecraft
-    (lib.mkIf ((roles.gaming.enable or false) && (roles.gaming.minecraft or false)) {
+    (lib.mkIf (config.roles.gaming.enable && config.roles.gaming.minecraft) {
       home.packages = with pkgs; [
         prismlauncher # Minecraft launcher
       ];

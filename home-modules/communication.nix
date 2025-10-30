@@ -1,10 +1,10 @@
 {
   lib,
   pkgs,
-  roles ? {},
+  config,
   ...
 }: {
-  config = lib.mkIf (roles.communication.enable or false) {
+  config = lib.mkIf config.roles.communication.enable {
     home.packages = with pkgs; [
       # Commented out - enable in desktop-apps.nix or per-user
       # discord

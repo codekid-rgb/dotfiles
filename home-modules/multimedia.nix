@@ -1,12 +1,12 @@
 {
   lib,
   pkgs,
-  roles ? {},
+  config,
   ...
 }: {
   config = lib.mkMerge [
     # Video tools
-    (lib.mkIf ((roles.multimedia.enable or false) && (roles.multimedia.video or false)) {
+    (lib.mkIf (config.roles.multimedia.enable && config.roles.multimedia.video) {
       home.packages = with pkgs; [
         obs-studio # Video recording/streaming
         plex-media-player # Media player
@@ -16,7 +16,7 @@
     })
 
     # Audio tools
-    (lib.mkIf ((roles.multimedia.enable or false) && (roles.multimedia.audio or false)) {
+    (lib.mkIf (config.roles.multimedia.enable && config.roles.multimedia.audio) {
       home.packages = with pkgs; [
         audacity # Audio editing
         alsa-utils # ALSA utilities
@@ -25,7 +25,7 @@
     })
 
     # Graphics tools
-    (lib.mkIf ((roles.multimedia.enable or false) && (roles.multimedia.graphics or false)) {
+    (lib.mkIf (config.roles.multimedia.enable && config.roles.multimedia.graphics) {
       home.packages = with pkgs; [
         # gimp # Image editor
         # inkscape # Vector graphics

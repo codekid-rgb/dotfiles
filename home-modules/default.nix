@@ -1,5 +1,6 @@
 {...}: {
   imports = [
+    ./roles.nix
     ./terminal.nix
     ./editors.nix
     ./git.nix

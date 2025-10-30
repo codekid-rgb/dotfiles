@@ -1,10 +1,10 @@
 {
   lib,
   pkgs,
-  roles ? {},
+  config,
   ...
 }: {
-  config = lib.mkIf ((roles.desktop.enable or false) && (roles.desktop.windowManager or "") == "gnome") {
+  config = lib.mkIf (config.roles.desktop.enable && config.roles.desktop.windowManager == "gnome") {
     home.packages = with pkgs; [
       # GNOME utilities
       gnome-tweaks

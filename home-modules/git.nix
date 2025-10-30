@@ -1,12 +1,12 @@
 {
   lib,
   pkgs,
-  roles ? {},
+  config,
   ...
 }: let
   rg = "${pkgs.ripgrep}/bin/rg";
 in {
-  config = lib.mkIf (roles.git.enable or false) {
+  config = lib.mkIf config.roles.git.enable {
     programs.git = {
       enable = true;
       lfs.enable = lib.mkDefault true;

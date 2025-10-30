@@ -1,10 +1,10 @@
 {
   lib,
   pkgs,
-  roles ? {},
+  config,
   ...
 }: {
-  config = lib.mkIf (roles.desktop.enable or false) {
+  config = lib.mkIf config.roles.desktop.enable {
     home.packages = with pkgs; [
       # File managers
       nautilus

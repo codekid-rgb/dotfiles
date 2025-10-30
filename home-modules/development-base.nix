@@ -1,10 +1,10 @@
 {
   lib,
   pkgs,
-  roles ? {},
+  config,
   ...
 }: {
-  config = lib.mkIf (roles.development.enable or false) {
+  config = lib.mkIf config.roles.development.enable {
     home.packages = with pkgs;
       [
         # Version control
@@ -23,20 +23,20 @@
         # sqlite
       ]
       # Language-specific packages
-      ++ lib.optionals (roles.development.languages.go or false) [
+      ++ lib.optionals config.roles.development.languages.go [
         go
       ]
-      ++ lib.optionals (roles.development.languages.python or false) [
+      ++ lib.optionals config.roles.development.languages.python [
         python311Full
       ]
-      ++ lib.optionals (roles.development.languages.rust or false) [
+      ++ lib.optionals config.roles.development.languages.rust [
         # rustc
         # cargo
       ]
-      ++ lib.optionals (roles.development.languages.java or false) [
+      ++ lib.optionals config.roles.development.languages.java [
         jdk17
       ]
-      ++ lib.optionals (roles.development.languages.racket or false) [
+      ++ lib.optionals config.roles.development.languages.racket [
         racket
       ];
   };

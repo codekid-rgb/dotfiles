@@ -1,12 +1,12 @@
 {
   lib,
   pkgs,
-  roles ? {},
+  config,
   ...
 }: {
   config = lib.mkMerge [
     # Productivity apps
-    (lib.mkIf ((roles.desktop.enable or false) && (roles.desktop.productivity or false)) {
+    (lib.mkIf (config.roles.desktop.enable && config.roles.desktop.productivity) {
       home.packages = with pkgs; [
         libreoffice
         evince # PDF viewer
@@ -16,7 +16,7 @@
     })
 
     # Web browsers
-    (lib.mkIf ((roles.desktop.enable or false) && (roles.desktop.browsers or false)) {
+    (lib.mkIf (config.roles.desktop.enable && config.roles.desktop.browsers) {
       home.packages = with pkgs; [
         # firefox # Temporarily disabled due to hash collision
         floorp # Firefox fork
@@ -31,7 +31,7 @@
     })
 
     # Communication apps
-    (lib.mkIf ((roles.desktop.enable or false) && (roles.desktop.communication or false)) {
+    (lib.mkIf (config.roles.desktop.enable && config.roles.desktop.communication) {
       home.packages = with pkgs; [
         discord
         # slack
@@ -41,7 +41,7 @@
     })
 
     # VS Code for desktop users
-    (lib.mkIf (roles.desktop.enable or false) {
+    (lib.mkIf config.roles.desktop.enable {
       programs.vscode.enable = lib.mkDefault true;
     })
   ];

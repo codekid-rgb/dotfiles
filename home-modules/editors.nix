@@ -1,10 +1,10 @@
 {
   lib,
   pkgs,
-  roles ? {},
+  config,
   ...
 }: {
-  config = lib.mkIf (roles.editors.enable or false) {
+  config = lib.mkIf config.roles.editors.enable {
     home = {
       packages = with pkgs; [
         # Basic editors

@@ -1,10 +1,10 @@
 {
   lib,
   pkgs,
-  roles ? {},
+  config,
   ...
 }: {
-  config = lib.mkIf (roles.terminal.enable or false) {
+  config = lib.mkIf config.roles.terminal.enable {
     home.packages = with pkgs; [
       # Core shell utilities
       fish
