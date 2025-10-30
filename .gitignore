@@ -18,3 +18,5 @@ xmonad/*.hi
 xmonad/lib/*.hi
 xmonad/*.errors
 vim/sessions/__LAST__
+home/eugene/modules/xmonad.nix.bak
+home/eugene/programs/git.bak/
