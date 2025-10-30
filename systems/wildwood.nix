@@ -3,8 +3,7 @@
   pkgs,
   lib,
   ...
-}:
-{
+}: {
   users.users.root.hashedPasswordFile = config.age.secrets.rootPasswd.path;
   hardware = {
     enableRedistributableFirmware = true;
@@ -16,7 +15,7 @@
   };
   boot = {
     initrd = {
-      kernelModules = [ ];
+      kernelModules = [];
 
       availableKernelModules = [
         "xhci_pci"
@@ -32,24 +31,22 @@
       };
       luks = {
         devices = {
-          "luks-461210a1-9972-4edb-9d09-969785bf51b6".device =
-            "/dev/disk/by-uuid/461210a1-9972-4edb-9d09-969785bf51b6";
+          "luks-461210a1-9972-4edb-9d09-969785bf51b6".device = "/dev/disk/by-uuid/461210a1-9972-4edb-9d09-969785bf51b6";
 
           # Enable swap on luks
-          "luks-124a19d0-de3d-4b28-8c69-cb56b7905426".device =
-            "/dev/disk/by-uuid/124a19d0-de3d-4b28-8c69-cb56b7905426";
+          "luks-124a19d0-de3d-4b28-8c69-cb56b7905426".device = "/dev/disk/by-uuid/124a19d0-de3d-4b28-8c69-cb56b7905426";
           "luks-124a19d0-de3d-4b28-8c69-cb56b7905426".keyFile = "/crypto_keyfile.bin";
         };
       };
     };
-    kernelModules = [ "kvm-intel" ];
-    extraModulePackages = [ ];
+    kernelModules = ["kvm-intel"];
+    extraModulePackages = [];
     loader = {
       systemd-boot.enable = true;
       efi.canTouchEfiVariables = true;
       efi.efiSysMountPoint = "/boot/efi";
     };
-    binfmt.emulatedSystems = [ "aarch64-linux" ];
+    binfmt.emulatedSystems = ["aarch64-linux"];
   };
 
   fileSystems."/" = {
@@ -62,7 +59,7 @@
     fsType = "vfat";
   };
 
-  swapDevices = [ { device = "/dev/disk/by-uuid/d32f9711-d667-4191-ada4-42889f0f1539"; } ];
+  swapDevices = [{device = "/dev/disk/by-uuid/d32f9711-d667-4191-ada4-42889f0f1539";}];
   networking = {
     hostName = "wildwood";
     networkmanager.enable = true;
@@ -84,7 +81,6 @@
         layout = "us";
         variant = "";
       };
-
     };
     # Enable libinput for trackpad support in all X11 sessions
     libinput = {
