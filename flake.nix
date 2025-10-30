@@ -354,11 +354,9 @@
                     enable = false;
                     includeCloud = false;
                   };
-                  desktop = {
-                    enable = false; # Headless
-                    gaming = false;
-                    multimedia = false;
-                  };
+                  desktop.enable = false; # Headless
+                  gaming.enable = false;
+                  multimedia.enable = false;
                   server.enable = true;
                 };
               }
@@ -410,11 +408,9 @@
                     enable = false;
                     includeCloud = false;
                   };
-                  desktop = {
-                    enable = false;
-                    gaming = false;
-                    multimedia = false;
-                  };
+                  desktop.enable = false;
+                  gaming.enable = false;
+                  multimedia.enable = false;
                 };
               }
               (mkUserConfig {
@@ -462,11 +458,9 @@
                     enable = false;
                     includeCloud = false;
                   };
-                  desktop = {
-                    enable = false; # Headless server
-                    gaming = false;
-                    multimedia = false;
-                  };
+                  desktop.enable = false; # Headless server
+                  gaming.enable = false;
+                  multimedia.enable = false;
                   server.enable = true;
                 };
               }
