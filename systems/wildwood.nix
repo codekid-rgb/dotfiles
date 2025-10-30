@@ -119,4 +119,16 @@
     pciutils
     gnumake
   ];
+
+  # Enable automatic dotfiles updates on boot
+  system.autoUpdate = {
+    enable = true;
+    onBoot = true;
+    # Optionally enable periodic checks (uncomment to enable):
+    # onCalendar = "daily";  # or "hourly", "weekly", etc.
+    flakePath = "/home/clord/dotfiles";  # Adjust to where your dotfiles are located
+    branch = "main";
+    operation = "switch";  # Apply changes immediately
+    allowReboot = false;  # Don't automatically reboot (you can enable this if you want)
+  };
 }
