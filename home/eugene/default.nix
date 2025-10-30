@@ -54,34 +54,37 @@
   # XMonad configuration
   xsession.windowManager.xmonad.config = ./xmonad.hs;
 
-  # Git user configuration (override shared defaults)
-  programs.git = {
-    userName = "Eugene Lord";
-    userEmail = "eugene@lord.ac";
+  # Program configurations
+  programs = {
+    # Git user configuration (override shared defaults)
+    git = {
+      userName = "Eugene Lord";
+      userEmail = "eugene@lord.ac";
 
-    # Enable difftastic for better diffs
-    difftastic.enable = true;
-  };
-
-  # GitHub CLI configuration
-  programs.gh = {
-    enable = true;
-    settings = {
-      version = 1;
-      git_protocol = "ssh";
-      editor = "nvim";
+      # Enable difftastic for better diffs
+      difftastic.enable = true;
     };
-  };
 
-  # Override alacritty font size (from eugene's original config)
-  programs.alacritty.settings.font.size = 14;
+    # GitHub CLI configuration
+    gh = {
+      enable = true;
+      settings = {
+        version = 1;
+        git_protocol = "ssh";
+        editor = "nvim";
+      };
+    };
 
-  # Enable programs that were explicitly configured before
-  programs.neovim.enable = true;
-  programs.vscode.enable = true;
-  programs.rofi = {
-    enable = true;
-    terminal = "${pkgs.alacritty}/bin/alacritty";
+    # Override alacritty font size (from eugene's original config)
+    alacritty.settings.font.size = 14;
+
+    # Enable programs that were explicitly configured before
+    neovim.enable = true;
+    vscode.enable = true;
+    rofi = {
+      enable = true;
+      terminal = "${pkgs.alacritty}/bin/alacritty";
+    };
   };
 
   # Additional packages not covered by modules
