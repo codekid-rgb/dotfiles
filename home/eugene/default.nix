@@ -15,6 +15,7 @@
     # Desktop setup
     desktop = {
       enable = true;
+      windowManager = "gnome"; # Enable GNOME
       productivity = true;
       browsers = true;
       communication = true;
