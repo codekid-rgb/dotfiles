@@ -1,0 +1,167 @@
+name: Auto-fix Lint Issues
+
+on:
+  pull_request:
+    types: [labeled]
+
+# Ensure only one auto-fix runs at a time per PR
+concurrency:
+  group: auto-fix-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  auto-fix:
+    # Only run when the "auto-fix" label is added
+    if: github.event.label.name == 'auto-fix'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+        with:
+          extra-conf: |
+            experimental-features = nix-command flakes
+            max-jobs = 4
+
+      - name: Setup Nix cache
+        uses: DeterminateSystems/magic-nix-cache-action@main
+
+      - name: Run auto-fix tools
+        id: fix
+        run: |
+          echo "Running auto-fix tools..."
+          CHANGES=false
+
+          # Run alejandra formatter
+          echo "🔧 Running alejandra formatter..."
+          if nix fmt .; then
+            echo "✅ Formatting complete"
+            if ! git diff --quiet; then
+              CHANGES=true
+              echo "📝 Formatting changes detected"
+            fi
+          else
+            echo "⚠️ Formatting failed (non-critical)"
+          fi
+
+          # Run statix fix for linting issues
+          echo "🔧 Running statix fix..."
+          if nix develop -c statix fix .; then
+            echo "✅ Statix fixes applied"
+            if ! git diff --quiet; then
+              CHANGES=true
+              echo "📝 Statix changes detected"
+            fi
+          else
+            echo "⚠️ Statix fix failed (non-critical)"
+          fi
+
+          # Run deadnix to remove unused code
+          echo "🔧 Running deadnix edit..."
+          if nix develop -c deadnix --edit .; then
+            echo "✅ Deadnix changes applied"
+            if ! git diff --quiet; then
+              CHANGES=true
+              echo "📝 Deadnix changes detected"
+            fi
+          else
+            echo "⚠️ Deadnix edit failed (non-critical)"
+          fi
+
+          # Set output variable
+          echo "changes=$CHANGES" >> $GITHUB_OUTPUT
+
+          if [ "$CHANGES" = true ]; then
+            echo "✨ Auto-fixes applied successfully!"
+          else
+            echo "✅ No changes needed - code is already clean!"
+          fi
+
+      - name: Check for changes
+        id: check-changes
+        run: |
+          if [ "${{ steps.fix.outputs.changes }}" = "true" ]; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit and push changes
+        if: steps.check-changes.outputs.has_changes == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add -A
+
+          cat > /tmp/commit-msg << 'EOF'
+          chore: auto-fix lint issues
+
+          Applied automatic fixes:
+          - alejandra formatting
+          - statix lint fixes
+          - deadnix unused code removal
+
+          Triggered by: ${{ github.actor }}
+          PR: #${{ github.event.pull_request.number }}
+          EOF
+
+          git commit -F /tmp/commit-msg
+          git push
+
+      - name: Comment on PR
+        if: steps.check-changes.outputs.has_changes == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '✨ Auto-fix complete! I applied the following fixes:\n\n' +
+                    '- 🎨 Code formatting (alejandra)\n' +
+                    '- 🔧 Lint fixes (statix)\n' +
+                    '- 🧹 Removed unused code (deadnix)\n\n' +
+                    'Please review the changes and ensure everything looks correct.'
+            })
+
+      - name: Comment on PR (no changes)
+        if: steps.check-changes.outputs.has_changes == 'false'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '✅ No auto-fixes needed - your code is already clean! 🎉'
+            })
+
+      - name: Remove auto-fix label
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            try {
+              await github.rest.issues.removeLabel({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                name: 'auto-fix'
+              })
+            } catch (error) {
+              console.log('Label already removed or does not exist')
+            }
