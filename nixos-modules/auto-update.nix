@@ -20,7 +20,10 @@ in {
 
     onCalendar = mkOption {
       type = types.nullOr types.str;
-      default = if (config.roles.autoUpdate.periodic or false) then "daily" else null;
+      default =
+        if (config.roles.autoUpdate.periodic or false)
+        then "daily"
+        else null;
       example = "hourly";
       description = ''
         Systemd calendar expression for periodic updates.
@@ -186,17 +189,17 @@ in {
           echo "$LOG_PREFIX Successfully applied configuration!"
 
           ${optionalString cfg.allowReboot ''
-            # Check if kernel was updated and reboot if allowed
-            if [[ "${cfg.operation}" != "test" ]]; then
-              CURRENT_KERNEL=$(uname -r)
-              NEW_KERNEL=$(readlink -f /run/current-system/kernel/bzImage | awk -F/ '{print $(NF-1)}' || echo "$CURRENT_KERNEL")
+          # Check if kernel was updated and reboot if allowed
+          if [[ "${cfg.operation}" != "test" ]]; then
+            CURRENT_KERNEL=$(uname -r)
+            NEW_KERNEL=$(readlink -f /run/current-system/kernel/bzImage | awk -F/ '{print $(NF-1)}' || echo "$CURRENT_KERNEL")
 
-              if [[ "$CURRENT_KERNEL" != "$NEW_KERNEL" ]]; then
-                echo "$LOG_PREFIX Kernel was updated. Rebooting in 60 seconds..."
-                shutdown -r +1 "System updated with new kernel. Rebooting..."
-              fi
+            if [[ "$CURRENT_KERNEL" != "$NEW_KERNEL" ]]; then
+              echo "$LOG_PREFIX Kernel was updated. Rebooting in 60 seconds..."
+              shutdown -r +1 "System updated with new kernel. Rebooting..."
             fi
-          ''}
+          fi
+        ''}
         else
           echo "$LOG_PREFIX Error: Failed to apply configuration"
           # Rollback to previous commit (as user)
