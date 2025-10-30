@@ -11,7 +11,7 @@
       dconf-editor
       gnome-system-monitor
       gnome-disk-utility
-      
+
       albert #like spolight but better in every way and it does not care about desktop
       # GNOME extensions (commented out - uncomment as needed)
       gnomeExtensions.pop-shell
