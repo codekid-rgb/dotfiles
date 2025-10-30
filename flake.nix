@@ -278,8 +278,20 @@
                   };
                   desktop = {
                     enable = true; # Has GNOME
-                    gaming = false;
-                    multimedia = false;
+                    browsers = true;
+                    communication = true;
+                    productivity = true;
+                  };
+                  gaming = {
+                    enable = true;
+                    steam = true;
+                    emulation = true; # RetroArch
+                  };
+                  multimedia = {
+                    enable = true;
+                    video = true; # VLC, MPV, OBS
+                    audio = true; # Audacity
+                    graphics = false; # GIMP, Inkscape (keep minimal for now)
                   };
                 };
               }
