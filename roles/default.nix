@@ -53,6 +53,11 @@
         default = true;
         description = "Include productivity tools (office suite, PDF viewers, etc)";
       };
+      windowManager = lib.mkOption {
+        type = lib.types.enum ["none" "xmonad"];
+        default = "none";
+        description = "Window manager to use (none, xmonad)";
+      };
     };
 
     gaming = {

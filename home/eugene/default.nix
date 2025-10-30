@@ -1,5 +1,5 @@
 {pkgs, ...}: {
-  imports = [./common.nix ./programs];
+  imports = [./common.nix ./programs ./modules];
 
   programs = {
     home-manager.enable = true;
@@ -20,7 +20,7 @@
     alsa-utils
     audacity
     discord
-    dmenu
+    # dmenu - moved to xmonad module
     dolphin
     typst
     typst-lsp
@@ -31,7 +31,7 @@
     exfat
     eza
     fd
-    feh
+    # feh - moved to xmonad module
     floorp
     gcc
     nautilus # Changed from gnome.nautilus
@@ -43,7 +43,7 @@
     libreoffice
     # matrix-commander # Removed: depends on insecure olm library
     networkmanagerapplet
-    nitrogen
+    # nitrogen - moved to xmonad module
     obs-studio
     plex-media-player
     prismlauncher
@@ -51,22 +51,12 @@
     racket
     steam
     terminator
-    trayer
+    # trayer - moved to xmonad module
     xfce.xfce4-power-manager
     xscreensaver
     yad
     zlib
   ];
-
-  xsession = {
-    enable = true;
-    windowManager.xmonad = {
-      enable = true;
-      enableContribAndExtras = true;
-      extraPackages = hp: [hp.dbus hp.monad-logger hp.xmonad-contrib];
-      config = ./xmonad.hs;
-    };
-  };
 
   systemd.user.startServices = "sd-switch";
 }
