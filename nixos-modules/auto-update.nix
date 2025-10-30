@@ -75,158 +75,152 @@ in {
   };
 
   # Enable the module if either the role is enabled or the direct config is enabled
-  config = mkIf (cfg.enable || roleEnabled) (mkMerge [
-    # Auto-enable if using role-based config
-    (mkIf roleEnabled {
-      system.autoUpdate.enable = true;
-    })
-    {
-      systemd.services.dotfiles-auto-update = {
-        description = "Automatic dotfiles update service";
-        wants = ["network-online.target"];
-        after = ["network-online.target"];
+  config = mkIf (cfg.enable || roleEnabled) {
+    systemd.services.dotfiles-auto-update = {
+      description = "Automatic dotfiles update service";
+      wants = ["network-online.target"];
+      after = ["network-online.target"];
 
-        # Only run on boot if configured
-        wantedBy = mkIf cfg.onBoot ["multi-user.target"];
+      # Only run on boot if configured
+      wantedBy = mkIf cfg.onBoot ["multi-user.target"];
 
-        path = with pkgs; [
-          git
-          nixos-rebuild
-          nix
-          gawk
-          sudo
-        ];
+      path = with pkgs; [
+        git
+        nixos-rebuild
+        nix
+        gawk
+        sudo
+      ];
 
-        serviceConfig = {
-          Type = "oneshot";
-          User = "root";
-          # Prevent service from failing the boot process
-          SuccessExitStatus = "0 1";
-          # Run with low priority to avoid impacting system performance
-          Nice = 19;
-          IOSchedulingClass = "idle";
-          CPUSchedulingPolicy = "idle";
-        };
+      serviceConfig = {
+        Type = "oneshot";
+        User = "root";
+        # Prevent service from failing the boot process
+        SuccessExitStatus = "0 1";
+        # Run with low priority to avoid impacting system performance
+        Nice = 19;
+        IOSchedulingClass = "idle";
+        CPUSchedulingPolicy = "idle";
+      };
 
-        script = ''
-          set -euo pipefail
+      script = ''
+        set -euo pipefail
 
-          FLAKE_PATH="${cfg.flakePath}"
-          BRANCH="${cfg.branch}"
-          GIT_USER="${cfg.gitUser}"
-          HOSTNAME="$(hostname -s)"
-          LOG_PREFIX="[dotfiles-auto-update]"
+        FLAKE_PATH="${cfg.flakePath}"
+        BRANCH="${cfg.branch}"
+        GIT_USER="${cfg.gitUser}"
+        HOSTNAME="$(hostname -s)"
+        LOG_PREFIX="[dotfiles-auto-update]"
 
-          echo "$LOG_PREFIX Starting dotfiles auto-update check..."
+        echo "$LOG_PREFIX Starting dotfiles auto-update check..."
 
-          # Ensure we're in the flake directory
-          if [[ ! -d "$FLAKE_PATH" ]]; then
-            echo "$LOG_PREFIX Error: Flake path $FLAKE_PATH does not exist"
-            exit 1
-          fi
+        # Ensure we're in the flake directory
+        if [[ ! -d "$FLAKE_PATH" ]]; then
+          echo "$LOG_PREFIX Error: Flake path $FLAKE_PATH does not exist"
+          exit 1
+        fi
 
-          cd "$FLAKE_PATH"
+        cd "$FLAKE_PATH"
 
-          # Ensure it's a git repository
-          if [[ ! -d .git ]]; then
-            echo "$LOG_PREFIX Error: $FLAKE_PATH is not a git repository"
-            exit 1
-          fi
+        # Ensure it's a git repository
+        if [[ ! -d .git ]]; then
+          echo "$LOG_PREFIX Error: $FLAKE_PATH is not a git repository"
+          exit 1
+        fi
 
-          # Helper function to run git as the configured user
-          git_as_user() {
-            sudo -u "$GIT_USER" git "$@"
-          }
+        # Helper function to run git as the configured user
+        git_as_user() {
+          sudo -u "$GIT_USER" git "$@"
+        }
 
-          # Store current commit before pulling
-          CURRENT_COMMIT=$(git_as_user rev-parse HEAD)
-          echo "$LOG_PREFIX Current commit: $CURRENT_COMMIT"
+        # Store current commit before pulling
+        CURRENT_COMMIT=$(git_as_user rev-parse HEAD)
+        echo "$LOG_PREFIX Current commit: $CURRENT_COMMIT"
 
-          # Fetch latest changes (as user to use their SSH keys)
-          echo "$LOG_PREFIX Fetching latest changes from origin (as user $GIT_USER)..."
-          if ! git_as_user fetch origin "$BRANCH"; then
-            echo "$LOG_PREFIX Warning: Failed to fetch from remote. Using local state."
-            exit 1
-          fi
+        # Fetch latest changes (as user to use their SSH keys)
+        echo "$LOG_PREFIX Fetching latest changes from origin (as user $GIT_USER)..."
+        if ! git_as_user fetch origin "$BRANCH"; then
+          echo "$LOG_PREFIX Warning: Failed to fetch from remote. Using local state."
+          exit 1
+        fi
 
-          # Check if there are updates
-          REMOTE_COMMIT=$(git_as_user rev-parse "origin/$BRANCH")
-          echo "$LOG_PREFIX Remote commit: $REMOTE_COMMIT"
+        # Check if there are updates
+        REMOTE_COMMIT=$(git_as_user rev-parse "origin/$BRANCH")
+        echo "$LOG_PREFIX Remote commit: $REMOTE_COMMIT"
 
-          if [[ "$CURRENT_COMMIT" == "$REMOTE_COMMIT" ]]; then
-            echo "$LOG_PREFIX No updates available. System is up to date."
-            exit 0
-          fi
+        if [[ "$CURRENT_COMMIT" == "$REMOTE_COMMIT" ]]; then
+          echo "$LOG_PREFIX No updates available. System is up to date."
+          exit 0
+        fi
 
-          echo "$LOG_PREFIX Updates available. Pulling changes..."
+        echo "$LOG_PREFIX Updates available. Pulling changes..."
 
-          # Check for local modifications
-          if [[ -n $(git_as_user status --porcelain) ]]; then
-            echo "$LOG_PREFIX Warning: Local modifications detected. Stashing changes..."
-            git_as_user stash push -m "auto-update-$(date +%Y%m%d-%H%M%S)"
-          fi
+        # Check for local modifications
+        if [[ -n $(git_as_user status --porcelain) ]]; then
+          echo "$LOG_PREFIX Warning: Local modifications detected. Stashing changes..."
+          git_as_user stash push -m "auto-update-$(date +%Y%m%d-%H%M%S)"
+        fi
 
-          # Pull the latest changes (as user to use their SSH keys)
-          if ! git_as_user pull origin "$BRANCH"; then
-            echo "$LOG_PREFIX Error: Failed to pull updates"
-            exit 1
-          fi
+        # Pull the latest changes (as user to use their SSH keys)
+        if ! git_as_user pull origin "$BRANCH"; then
+          echo "$LOG_PREFIX Error: Failed to pull updates"
+          exit 1
+        fi
 
-          NEW_COMMIT=$(git_as_user rev-parse HEAD)
-          echo "$LOG_PREFIX Updated to commit: $NEW_COMMIT"
+        NEW_COMMIT=$(git_as_user rev-parse HEAD)
+        echo "$LOG_PREFIX Updated to commit: $NEW_COMMIT"
 
-          # Show what changed
-          echo "$LOG_PREFIX Changes:"
-          git_as_user log --oneline "$CURRENT_COMMIT..$NEW_COMMIT" || true
+        # Show what changed
+        echo "$LOG_PREFIX Changes:"
+        git_as_user log --oneline "$CURRENT_COMMIT..$NEW_COMMIT" || true
 
-          # Perform dry-run first as safety check (runs as root)
-          echo "$LOG_PREFIX Performing dry-run..."
-          if ! nixos-rebuild dry-activate --flake ".#$HOSTNAME"; then
-            echo "$LOG_PREFIX Error: Dry-run failed. Not applying changes."
-            # Rollback to previous commit (as user)
-            git_as_user reset --hard "$CURRENT_COMMIT"
-            exit 1
-          fi
+        # Perform dry-run first as safety check (runs as root)
+        echo "$LOG_PREFIX Performing dry-run..."
+        if ! nixos-rebuild dry-activate --flake ".#$HOSTNAME"; then
+          echo "$LOG_PREFIX Error: Dry-run failed. Not applying changes."
+          # Rollback to previous commit (as user)
+          git_as_user reset --hard "$CURRENT_COMMIT"
+          exit 1
+        fi
 
-          # Apply the configuration (runs as root)
-          echo "$LOG_PREFIX Applying new configuration..."
-          if nixos-rebuild ${cfg.operation} --flake ".#$HOSTNAME"; then
-            echo "$LOG_PREFIX Successfully applied configuration!"
+        # Apply the configuration (runs as root)
+        echo "$LOG_PREFIX Applying new configuration..."
+        if nixos-rebuild ${cfg.operation} --flake ".#$HOSTNAME"; then
+          echo "$LOG_PREFIX Successfully applied configuration!"
 
-            ${optionalString cfg.allowReboot ''
-              # Check if kernel was updated and reboot if allowed
-              if [[ "${cfg.operation}" != "test" ]]; then
-                CURRENT_KERNEL=$(uname -r)
-                NEW_KERNEL=$(readlink -f /run/current-system/kernel/bzImage | awk -F/ '{print $(NF-1)}' || echo "$CURRENT_KERNEL")
+          ${optionalString cfg.allowReboot ''
+            # Check if kernel was updated and reboot if allowed
+            if [[ "${cfg.operation}" != "test" ]]; then
+              CURRENT_KERNEL=$(uname -r)
+              NEW_KERNEL=$(readlink -f /run/current-system/kernel/bzImage | awk -F/ '{print $(NF-1)}' || echo "$CURRENT_KERNEL")
 
-                if [[ "$CURRENT_KERNEL" != "$NEW_KERNEL" ]]; then
-                  echo "$LOG_PREFIX Kernel was updated. Rebooting in 60 seconds..."
-                  shutdown -r +1 "System updated with new kernel. Rebooting..."
-                fi
+              if [[ "$CURRENT_KERNEL" != "$NEW_KERNEL" ]]; then
+                echo "$LOG_PREFIX Kernel was updated. Rebooting in 60 seconds..."
+                shutdown -r +1 "System updated with new kernel. Rebooting..."
               fi
-            ''}
-          else
-            echo "$LOG_PREFIX Error: Failed to apply configuration"
-            # Rollback to previous commit (as user)
-            git_as_user reset --hard "$CURRENT_COMMIT"
-            nixos-rebuild ${cfg.operation} --flake ".#$HOSTNAME" || true
-            exit 1
-          fi
+            fi
+          ''}
+        else
+          echo "$LOG_PREFIX Error: Failed to apply configuration"
+          # Rollback to previous commit (as user)
+          git_as_user reset --hard "$CURRENT_COMMIT"
+          nixos-rebuild ${cfg.operation} --flake ".#$HOSTNAME" || true
+          exit 1
+        fi
 
-          echo "$LOG_PREFIX Update completed successfully!"
-        '';
-      };
+        echo "$LOG_PREFIX Update completed successfully!"
+      '';
+    };
 
-      # Optional timer for periodic updates
-      systemd.timers.dotfiles-auto-update = mkIf (cfg.onCalendar != null) {
-        description = "Periodic dotfiles update timer";
-        wantedBy = ["timers.target"];
-        timerConfig = {
-          OnCalendar = cfg.onCalendar;
-          Persistent = true;
-          RandomizedDelaySec = "5min";
-        };
+    # Optional timer for periodic updates
+    systemd.timers.dotfiles-auto-update = mkIf (cfg.onCalendar != null) {
+      description = "Periodic dotfiles update timer";
+      wantedBy = ["timers.target"];
+      timerConfig = {
+        OnCalendar = cfg.onCalendar;
+        Persistent = true;
+        RandomizedDelaySec = "5min";
       };
-    }
-  ]);
+    };
+  };
 }
