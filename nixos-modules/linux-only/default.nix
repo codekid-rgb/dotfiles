@@ -5,5 +5,6 @@
     ./networking.nix
     ./security.nix
     ./services.nix
+    ../auto-update.nix
   ];
 }
