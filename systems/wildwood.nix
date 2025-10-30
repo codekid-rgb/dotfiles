@@ -70,6 +70,16 @@
         layout = "us";
         variant = "";
       };
+
+      # Enable libinput for trackpad support in all X11 sessions
+      libinput = {
+        enable = true;
+        touchpad = {
+          tapping = true;
+          naturalScrolling = true;
+          disableWhileTyping = true;
+        };
+      };
     };
 
     # Enable CUPS to print documents.
