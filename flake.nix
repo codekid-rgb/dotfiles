@@ -299,6 +299,10 @@
                   };
                 };
               }
+              # Override default flakePath if dotfiles are in a custom location
+              {
+                system.autoUpdate.flakePath = "/home/clord/dotfiles";
+              }
               (mkUserConfig {
                 username = "clord";
                 isLinux = true;

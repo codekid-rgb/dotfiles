@@ -8,12 +8,6 @@ with lib; let
   # Support both the role-based config and the direct config
   roleEnabled = config.roles.autoUpdate.enable or false;
   cfg = config.system.autoUpdate;
-
-  # Smart defaults for flake path
-  defaultFlakePath =
-    if pathExists "/home/clord/dotfiles/.git" then "/home/clord/dotfiles"
-    else if pathExists "/etc/nixos/.git" then "/etc/nixos"
-    else "/etc/nixos";
 in {
   options.system.autoUpdate = {
     enable = mkEnableOption "automatic dotfiles updates";
@@ -37,7 +31,7 @@ in {
 
     flakePath = mkOption {
       type = types.path;
-      default = defaultFlakePath;
+      default = "/etc/dotfiles";
       description = "Path to the dotfiles flake repository";
     };
 

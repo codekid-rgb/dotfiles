@@ -40,7 +40,7 @@ roles = {
 ```
 
 This automatically:
-- Detects your dotfiles location (`/home/clord/dotfiles` or `/etc/nixos`)
+- Uses `/etc/dotfiles` as the repository location (override with `system.autoUpdate.flakePath` if needed)
 - Checks for updates on boot
 - Tracks the `main` branch
 - Uses `nixos-rebuild switch`
@@ -48,17 +48,17 @@ This automatically:
 
 ### Advanced Configuration
 
-For more control, you can use the direct configuration:
+For more control, you can override any defaults:
 
 ```nix
 system.autoUpdate = {
   enable = true;                           # Enable the feature
-  onBoot = true;                           # Check on boot
-  onCalendar = "daily";                    # Optional: periodic checks (null to disable)
-  flakePath = "/home/clord/dotfiles";     # Path to your dotfiles repo
-  branch = "main";                         # Git branch to track
-  operation = "switch";                    # "switch", "boot", or "test"
-  allowReboot = false;                     # Auto-reboot on kernel updates
+  onBoot = true;                           # Check on boot (default: true)
+  onCalendar = "daily";                    # Optional: periodic checks (default: null)
+  flakePath = "/home/clord/dotfiles";     # Path to your dotfiles repo (default: /etc/dotfiles)
+  branch = "develop";                      # Git branch to track (default: main)
+  operation = "boot";                      # "switch", "boot", or "test" (default: switch)
+  allowReboot = true;                      # Auto-reboot on kernel updates (default: false)
 };
 ```
 
@@ -123,13 +123,15 @@ roles.autoUpdate.enable = true;
 
 **Direct configuration:**
 ```nix
-system.autoUpdate = {
-  enable = true;
-  onBoot = true;
-  onCalendar = null;  # No periodic checks
-  flakePath = "/home/clord/dotfiles";
-  operation = "switch";
-};
+system.autoUpdate.enable = true;
+# That's it! Uses sensible defaults:
+#   flakePath = "/etc/dotfiles"
+#   onBoot = true
+#   branch = "main"
+#   operation = "switch"
+
+# Or override if needed:
+# system.autoUpdate.flakePath = "/home/clord/dotfiles";
 ```
 
 ### Daily updates
@@ -146,10 +148,7 @@ roles.autoUpdate = {
 ```nix
 system.autoUpdate = {
   enable = true;
-  onBoot = true;
-  onCalendar = "daily";  # Check once per day
-  flakePath = "/home/clord/dotfiles";
-  operation = "switch";
+  onCalendar = "daily";  # Check once per day (in addition to boot)
 };
 ```
 
@@ -190,11 +189,29 @@ system.autoUpdate = {
 };
 ```
 
+## How It Works (Systemd)
+
+Once enabled, systemd handles everything automatically:
+
+1. **On boot** (if `onBoot = true`, which is the default):
+   - The `dotfiles-auto-update.service` runs after network is online
+   - Checks for updates and applies if found
+   - Logs everything to systemd journal
+
+2. **On schedule** (if `onCalendar` is set):
+   - A systemd timer triggers the service at the specified interval
+   - Same update check runs automatically
+
+3. **No manual intervention needed**:
+   - You just push to your git repo
+   - Next boot (or timer trigger), changes apply automatically
+   - Check logs anytime with `journalctl -u dotfiles-auto-update.service`
+
 ## Prerequisites
 
 For this to work, ensure:
 
-1. **Git repository is cloned**: The dotfiles must be cloned to the specified `flakePath`
+1. **Git repository is cloned**: The dotfiles must be cloned to `/etc/dotfiles` (or your custom `flakePath`)
 2. **Git credentials configured**: The system must be able to `git fetch` and `git pull`
    - For public repos, no credentials needed
    - For private repos, set up SSH keys or credential helpers
