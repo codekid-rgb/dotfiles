@@ -109,7 +109,7 @@ in {
         FLAKE_PATH="${cfg.flakePath}"
         BRANCH="${cfg.branch}"
         GIT_USER="${cfg.gitUser}"
-        HOSTNAME="$(hostname -s)"
+        HOSTNAME="${config.networking.hostName}"
         LOG_PREFIX="[dotfiles-auto-update]"
 
         echo "$LOG_PREFIX Starting dotfiles auto-update check..."
