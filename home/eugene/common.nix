@@ -1,10 +1,17 @@
 _: {
   imports = [];
   home.stateVersion = "24.05";
-  programs = {
-    bat.enable = true;
-    ssh = import ./ssh.nix;
-    # Let Home Manager install and manage itself.
-    home-manager.enable = true;
+
+  # Enable bat for better cat output
+  programs.bat.enable = true;
+
+  # SSH configuration
+  programs.ssh = {
+    enable = true;
+    matchBlocks = {};
+    extraConfig = "";
   };
+
+  # Let Home Manager install and manage itself.
+  programs.home-manager.enable = true;
 }
