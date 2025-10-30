@@ -65,17 +65,20 @@ system.autoUpdate = {
 ### Options Explained
 
 - **`enable`**: Master switch for the auto-update feature
-- **`onBoot`**: Whether to check for updates when the system boots
-- **`onCalendar`**: Systemd timer expression for periodic checks
+- **`onBoot`**: Whether to check for updates when the system boots (default: true)
+- **`onCalendar`**: Systemd timer expression for periodic checks (default: null)
   - Examples: `"hourly"`, `"daily"`, `"weekly"`, `"*:0/15"` (every 15 min)
   - Set to `null` to disable periodic updates
-- **`flakePath`**: Absolute path to your dotfiles git repository
-- **`branch`**: Git branch to track for updates (usually `"main"` or `"master"`)
-- **`operation`**: NixOS rebuild operation:
-  - `"switch"`: Apply immediately and on next boot (default)
+- **`flakePath`**: Absolute path to your dotfiles git repository (default: `/etc/dotfiles`)
+- **`branch`**: Git branch to track for updates (default: `"main"`)
+- **`operation`**: NixOS rebuild operation (default: `"switch"`)
+  - `"switch"`: Apply immediately and on next boot
   - `"boot"`: Apply only on next boot
   - `"test"`: Apply immediately but not persistent
-- **`allowReboot`**: If true, system will auto-reboot when kernel is updated
+- **`allowReboot`**: If true, system will auto-reboot when kernel is updated (default: false)
+- **`gitUser`**: User to run git operations as, for SSH key access (default: `"clord"`)
+  - Git commands run as this user to access their SSH keys
+  - `nixos-rebuild` still runs as root with proper privileges
 
 ## Monitoring
 
@@ -212,11 +215,25 @@ Once enabled, systemd handles everything automatically:
 For this to work, ensure:
 
 1. **Git repository is cloned**: The dotfiles must be cloned to `/etc/dotfiles` (or your custom `flakePath`)
-2. **Git credentials configured**: The system must be able to `git fetch` and `git pull`
+   - Clone as root: `sudo git clone <your-repo> /etc/dotfiles`
+
+2. **Git credentials configured**: Git operations run as the configured user (default: `clord`)
    - For public repos, no credentials needed
-   - For private repos, set up SSH keys or credential helpers
+   - For private repos, ensure the user has SSH keys set up:
+     ```bash
+     # As clord user
+     ssh-keyscan github.com >> ~/.ssh/known_hosts
+     # Add your SSH key to GitHub
+     ```
+   - The service runs git commands as this user via `sudo -u clord git ...`
+   - This allows git to use the user's SSH keys for authentication
+
 3. **Network access**: System needs internet to fetch updates
-4. **Permissions**: The service runs as root, so ensure proper ownership
+
+4. **Permissions**:
+   - Service runs as root for `nixos-rebuild`
+   - Git operations run as configured user for SSH key access
+   - Repository should be readable by the git user
 
 ## Workflow Integration
 

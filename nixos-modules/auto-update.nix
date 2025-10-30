@@ -60,6 +60,15 @@ in {
         Only applies when operation is "switch" or "boot".
       '';
     };
+
+    gitUser = mkOption {
+      type = types.str;
+      default = "clord";
+      description = ''
+        User to run git operations as (for SSH key access).
+        Git fetch/pull will run as this user, while nixos-rebuild runs as root.
+      '';
+    };
   };
 
   # Enable the module if either the role is enabled or the direct config is enabled
@@ -82,6 +91,7 @@ in {
           nixos-rebuild
           nix
           gawk
+          sudo
         ];
 
         serviceConfig = {
@@ -96,6 +106,7 @@ in {
 
           FLAKE_PATH="${cfg.flakePath}"
           BRANCH="${cfg.branch}"
+          GIT_USER="${cfg.gitUser}"
           HOSTNAME="$(hostname -s)"
           LOG_PREFIX="[dotfiles-auto-update]"
 
@@ -115,19 +126,24 @@ in {
             exit 1
           fi
 
+          # Helper function to run git as the configured user
+          git_as_user() {
+            sudo -u "$GIT_USER" git "$@"
+          }
+
           # Store current commit before pulling
-          CURRENT_COMMIT=$(git rev-parse HEAD)
+          CURRENT_COMMIT=$(git_as_user rev-parse HEAD)
           echo "$LOG_PREFIX Current commit: $CURRENT_COMMIT"
 
-          # Fetch latest changes
-          echo "$LOG_PREFIX Fetching latest changes from origin..."
-          if ! git fetch origin "$BRANCH"; then
+          # Fetch latest changes (as user to use their SSH keys)
+          echo "$LOG_PREFIX Fetching latest changes from origin (as user $GIT_USER)..."
+          if ! git_as_user fetch origin "$BRANCH"; then
             echo "$LOG_PREFIX Warning: Failed to fetch from remote. Using local state."
             exit 1
           fi
 
           # Check if there are updates
-          REMOTE_COMMIT=$(git rev-parse "origin/$BRANCH")
+          REMOTE_COMMIT=$(git_as_user rev-parse "origin/$BRANCH")
           echo "$LOG_PREFIX Remote commit: $REMOTE_COMMIT"
 
           if [[ "$CURRENT_COMMIT" == "$REMOTE_COMMIT" ]]; then
@@ -138,34 +154,34 @@ in {
           echo "$LOG_PREFIX Updates available. Pulling changes..."
 
           # Check for local modifications
-          if [[ -n $(git status --porcelain) ]]; then
+          if [[ -n $(git_as_user status --porcelain) ]]; then
             echo "$LOG_PREFIX Warning: Local modifications detected. Stashing changes..."
-            git stash push -m "auto-update-$(date +%Y%m%d-%H%M%S)"
+            git_as_user stash push -m "auto-update-$(date +%Y%m%d-%H%M%S)"
           fi
 
-          # Pull the latest changes
-          if ! git pull origin "$BRANCH"; then
+          # Pull the latest changes (as user to use their SSH keys)
+          if ! git_as_user pull origin "$BRANCH"; then
             echo "$LOG_PREFIX Error: Failed to pull updates"
             exit 1
           fi
 
-          NEW_COMMIT=$(git rev-parse HEAD)
+          NEW_COMMIT=$(git_as_user rev-parse HEAD)
           echo "$LOG_PREFIX Updated to commit: $NEW_COMMIT"
 
           # Show what changed
           echo "$LOG_PREFIX Changes:"
-          git log --oneline "$CURRENT_COMMIT..$NEW_COMMIT" || true
+          git_as_user log --oneline "$CURRENT_COMMIT..$NEW_COMMIT" || true
 
-          # Perform dry-run first as safety check
+          # Perform dry-run first as safety check (runs as root)
           echo "$LOG_PREFIX Performing dry-run..."
           if ! nixos-rebuild dry-activate --flake ".#$HOSTNAME"; then
             echo "$LOG_PREFIX Error: Dry-run failed. Not applying changes."
-            # Rollback to previous commit
-            git reset --hard "$CURRENT_COMMIT"
+            # Rollback to previous commit (as user)
+            git_as_user reset --hard "$CURRENT_COMMIT"
             exit 1
           fi
 
-          # Apply the configuration
+          # Apply the configuration (runs as root)
           echo "$LOG_PREFIX Applying new configuration..."
           if nixos-rebuild ${cfg.operation} --flake ".#$HOSTNAME"; then
             echo "$LOG_PREFIX Successfully applied configuration!"
@@ -184,8 +200,8 @@ in {
             ''}
           else
             echo "$LOG_PREFIX Error: Failed to apply configuration"
-            # Rollback to previous commit
-            git reset --hard "$CURRENT_COMMIT"
+            # Rollback to previous commit (as user)
+            git_as_user reset --hard "$CURRENT_COMMIT"
             nixos-rebuild ${cfg.operation} --flake ".#$HOSTNAME" || true
             exit 1
           fi
