@@ -204,9 +204,6 @@ in {
           RandomizedDelaySec = "5min";
         };
       };
-
-      # Ensure the timer triggers the service
-      systemd.services.dotfiles-auto-update.wantedBy = mkIf (cfg.onCalendar != null) [];
     }
   ]);
 }
