@@ -9,7 +9,7 @@
       enable = true;
       settings = {font.size = 14;};
     };
-    firefox.enable = true;
+    # firefox.enable = true; # Temporarily disabled due to hash collision
     git.enable = true;
     rofi = {
       enable = true;

@@ -42,7 +42,7 @@
     # Web browsers
     (lib.mkIf (roles.desktop.enable && roles.desktop.browsers) {
       home.packages = with pkgs; [
-        firefox # Default browser
+        # firefox # Default browser (temporarily disabled due to hash collision)
 
         # Additional browsers (commented out - uncomment as needed):
         # google-chrome    # Google Chrome
@@ -53,11 +53,11 @@
         # tor-browser-bundle-bin # Tor browser
       ];
 
-      # Firefox configuration
-      programs.firefox = {
-        enable = true;
-        # Add profile customization here if needed
-      };
+      # Firefox configuration (temporarily disabled due to hash collision)
+      # programs.firefox = {
+      #   enable = true;
+      #   # Add profile customization here if needed
+      # };
     })
 
     # Communication tools
