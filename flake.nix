@@ -293,6 +293,10 @@
                     audio = true; # Audacity
                     graphics = false; # GIMP, Inkscape (keep minimal for now)
                   };
+                  autoUpdate = {
+                    enable = true; # Auto-update dotfiles on boot!
+                    periodic = false; # Only on boot, not on a schedule
+                  };
                 };
               }
               (mkUserConfig {

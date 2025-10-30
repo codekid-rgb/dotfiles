@@ -96,6 +96,15 @@
     server = {
       enable = lib.mkEnableOption "Server and infrastructure tools";
     };
+
+    autoUpdate = {
+      enable = lib.mkEnableOption "Automatic dotfiles updates on boot";
+      periodic = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = "Enable periodic (daily) updates in addition to boot updates";
+      };
+    };
   };
 
   config = {};

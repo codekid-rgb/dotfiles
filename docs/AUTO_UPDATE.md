@@ -25,7 +25,30 @@ The `auto-update.nix` module creates a systemd service that:
 
 ## Configuration
 
-Enable auto-updates in your system configuration:
+### Simple Configuration (Recommended)
+
+The easiest way to enable auto-updates is using the role-based configuration in `flake.nix`:
+
+```nix
+roles = {
+  # ... your other roles ...
+  autoUpdate = {
+    enable = true;   # That's it! Sensible defaults are applied
+    periodic = false; # Optional: set to true for daily updates
+  };
+};
+```
+
+This automatically:
+- Detects your dotfiles location (`/home/clord/dotfiles` or `/etc/nixos`)
+- Checks for updates on boot
+- Tracks the `main` branch
+- Uses `nixos-rebuild switch`
+- Won't auto-reboot
+
+### Advanced Configuration
+
+For more control, you can use the direct configuration:
 
 ```nix
 system.autoUpdate = {
@@ -91,8 +114,14 @@ journalctl -u dotfiles-auto-update.service -f
 
 ## Example Configurations
 
-### Boot-only updates (safest)
+### Boot-only updates (safest, recommended)
 
+**Using roles (simplest):**
+```nix
+roles.autoUpdate.enable = true;
+```
+
+**Direct configuration:**
 ```nix
 system.autoUpdate = {
   enable = true;
@@ -103,8 +132,30 @@ system.autoUpdate = {
 };
 ```
 
+### Daily updates
+
+**Using roles:**
+```nix
+roles.autoUpdate = {
+  enable = true;
+  periodic = true;  # Enables daily updates
+};
+```
+
+**Direct configuration:**
+```nix
+system.autoUpdate = {
+  enable = true;
+  onBoot = true;
+  onCalendar = "daily";  # Check once per day
+  flakePath = "/home/clord/dotfiles";
+  operation = "switch";
+};
+```
+
 ### Daily updates with auto-reboot
 
+**Direct configuration only (no role option for allowReboot):**
 ```nix
 system.autoUpdate = {
   enable = true;
