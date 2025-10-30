@@ -1,5 +1,0 @@
-{
-  enable = true;
-  matchBlocks = {};
-  extraConfig = "";
-}

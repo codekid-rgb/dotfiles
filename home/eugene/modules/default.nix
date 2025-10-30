@@ -1,5 +1,5 @@
 {...}: {
   imports = [
-    ./xmonad.nix
+    # xmonad.nix removed - now handled by shared home-modules
   ];
 }
