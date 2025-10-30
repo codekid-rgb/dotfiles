@@ -18,7 +18,6 @@
     # Desktop setup
     desktop = {
       enable = true;
-      windowManager = ""; # XMonad disabled for now
       productivity = true;
       browsers = true;
       communication = true;
