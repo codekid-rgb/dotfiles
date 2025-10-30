@@ -9,7 +9,7 @@
     (lib.mkIf roles.desktop.enable {
       home.packages = with pkgs; [
         # Core desktop tools
-        gnome.gnome-tweaks # GNOME customization
+        gnome-tweaks # GNOME customization
         dconf-editor # GNOME settings editor
 
         # Editors
@@ -19,8 +19,8 @@
         # (nautilus is included with GNOME by default)
 
         # System utilities
-        gnome.gnome-system-monitor # System monitor
-        gnome.gnome-disk-utility # Disk management
+        gnome-system-monitor # System monitor
+        gnome-disk-utility # Disk management
 
         # Additional desktop utilities (commented out - uncomment as needed):
         # gnomeExtensions.dash-to-dock      # Better dock
@@ -42,7 +42,7 @@
     # Web browsers
     (lib.mkIf (roles.desktop.enable && roles.desktop.browsers) {
       home.packages = with pkgs; [
-        firefox # Default browser
+        # firefox # Default browser (temporarily disabled due to hash collision)
 
         # Additional browsers (commented out - uncomment as needed):
         # google-chrome    # Google Chrome
@@ -53,11 +53,11 @@
         # tor-browser-bundle-bin # Tor browser
       ];
 
-      # Firefox configuration
-      programs.firefox = {
-        enable = true;
-        # Add profile customization here if needed
-      };
+      # Firefox configuration (temporarily disabled due to hash collision)
+      # programs.firefox = {
+      #   enable = true;
+      #   # Add profile customization here if needed
+      # };
     })
 
     # Communication tools
