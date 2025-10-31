@@ -278,6 +278,7 @@
                   };
                   desktop = {
                     enable = true; # Has GNOME
+                    windowManager = "gnome";
                     browsers = true;
                     communication = true;
                     productivity = true;
