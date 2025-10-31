@@ -132,9 +132,13 @@ in {
         fi
 
         # Helper function to run git as the configured user
-        # Preserve SSH_AUTH_SOCK to allow SSH agent access for git operations
+        # Set HOME and SSH environment for direct SSH key access
+        # This allows git to find SSH keys in ~/.ssh/ without needing an SSH agent
         git_as_user() {
-          sudo --preserve-env=SSH_AUTH_SOCK,SSH_AGENT_PID -u "$GIT_USER" git "$@"
+          sudo -u "$GIT_USER" \
+            HOME="/home/$GIT_USER" \
+            GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/home/$GIT_USER/.ssh/known_hosts" \
+            git "$@"
         }
 
         # Store current commit before pulling
