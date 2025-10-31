@@ -132,8 +132,9 @@ in {
         fi
 
         # Helper function to run git as the configured user
+        # Preserve SSH_AUTH_SOCK to allow SSH agent access for git operations
         git_as_user() {
-          sudo -u "$GIT_USER" git "$@"
+          sudo --preserve-env=SSH_AUTH_SOCK,SSH_AGENT_PID -u "$GIT_USER" git "$@"
         }
 
         # Store current commit before pulling
