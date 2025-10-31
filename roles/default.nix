@@ -54,9 +54,9 @@
         description = "Include productivity tools (office suite, PDF viewers, etc)";
       };
       windowManager = lib.mkOption {
-        type = lib.types.enum ["none" "xmonad"];
+        type = lib.types.enum ["none" "xmonad" "gnome"];
         default = "none";
-        description = "Window manager to use (none, xmonad)";
+        description = "Window manager to use (none, xmonad, gnome)";
       };
     };
 
