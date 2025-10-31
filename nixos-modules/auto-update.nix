@@ -112,6 +112,9 @@ in {
         HOSTNAME="${config.networking.hostName}"
         LOG_PREFIX="[dotfiles-auto-update]"
 
+        # Add user's profile bin to PATH for ssh and other user-specific tools
+        export PATH="/etc/profiles/per-user/$GIT_USER/bin:$PATH"
+
         echo "$LOG_PREFIX Starting dotfiles auto-update check..."
 
         # Ensure we're in the flake directory
