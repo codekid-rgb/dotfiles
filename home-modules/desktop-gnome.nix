@@ -13,15 +13,15 @@
       gnome-disk-utility
       albert #like spolight but better in every way and it does not care about desktop
       # GNOME extensions (commented out - uncomment as needed)
-      gnomeExtensions.pop-shell
-      gnomeExtensions.open-bar
-      gnomeExtensions.dash-to-dock
+  gnomeExtensions."pop-shell"
+  gnomeExtensions."open-bar"
+  gnomeExtensions."dash-to-dock"
       # gnomeExtensions.appindicator
       # gnomeExtensions.clipboard-history
       # gnomeExtensions.caffeine
-      gnomeExtensions.vitals
-      gnomeExtensions.hide-activities-button
-      gnomeExtensions.unite
+  gnomeExtensions.vitals
+  gnomeExtensions."hide-activities-button"
+  gnomeExtensions.unite
     ];
   };
 }
