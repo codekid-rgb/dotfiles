@@ -151,3 +151,5 @@ Inspired by:
 - [ ] Add more documentation per module
 - [ ] Set up Homelab server configurations
 - [ ] Complete Grafana development setup
+- [ ] Fix the GNOME Extension Issues
+- [ ] Add Thereien using extended GNOME
