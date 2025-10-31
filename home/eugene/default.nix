@@ -54,8 +54,11 @@
     };
   };
 
-  # XMonad configuration
-  xsession.windowManager.xmonad.config = ./xmonad.hs;
+  # XMonad configuration removed - conflicts with GNOME
+  # If you want to use XMonad instead of GNOME:
+  #   1. Change windowManager = "gnome" to "xmonad" above
+  #   2. Uncomment the line below:
+  # xsession.windowManager.xmonad.config = ./xmonad.hs;
 
   # Program configurations
   programs = {
